@@ -15,7 +15,7 @@ declare
 	start_time varchar(50) = ' 00:00:00';
 	end_time varchar(50) = ' 23:59:59';
  	cut_off_time varchar(50);
-	lastsuccessfullexecuteddate varchar(50)  = '1570-01-01 00:00:00';;
+	lastsuccessfullexecuteddate varchar(50)  = '1570-01-01 00:00:00';
 begin
 	cut_off_time = ' ' || (select cast((select cutofftime from pinnacle_interim_database.source_db_mapping where sourceid = db_instance_id) as varchar));
 	if(select count(*) from pinnacle_interim_database.log_history lh where lh.sourceid = db_instance_id 
