@@ -57,7 +57,7 @@ begin
 		select * from dblink(remote_conn,CONCAT('select ledgerid,
 		created, user, multiloc, saletype, transtype, custlink, invoice_id, billamount, paymentid, payamount,
 		hidden, allocated, description,', db_instance_id,E' from proview.salesledger where created between  
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\''))
 		AS P(ledgerid int4, created timestamp, "user" varchar, multiloc int4, saletype text, transtype text,
 		custlink int4, invoice_id int4, billamount numeric(10, 2), paymentid int4, payamount numeric(10, 2),
@@ -68,7 +68,7 @@ begin
 		--Getting number of records from source db which being inserted into interm database
 		select into sourcedbcount count(*) from dblink(remote_conn,E'select ledgerid
 		from proview.salesledger where created between  
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'') AS P(ledgerid int4);
 	
 		--insert log table

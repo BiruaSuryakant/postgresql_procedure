@@ -73,7 +73,7 @@ begin
 	dismantler, storeman, checkval, global_acc, status, assembly, holdstatus, repair_hrs, objectword, resolve, 
 	transmit, lastpriced, altindex, converted, multiloc, doublecond, verified, visibledate, currentstatus, 
 	credit_no, inventory_id,',db_instance_id,E' from proview.oldparts where sold_date between 
-	\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+	\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 	(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'')) 
 	AS P(sold_date date, sold_time text, price_sold numeric(10, 2), who_sold varchar, how_sold text, 
 	deletereason text, invoice_no int4, restocked date, costprice numeric(10, 2), ic bpchar(6), model bpchar(4), 
@@ -89,7 +89,7 @@ begin
 	
 	--Getting number of records from source db which being inserted into interm database
 	select into sourcedbcount count(*) from dblink(remote_conn,E'select inventory_id from proview.oldparts where sold_date between 
-	\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+	\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 	(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'') AS P(inventory_id int4);
 
 	--insert log table

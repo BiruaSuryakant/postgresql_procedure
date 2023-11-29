@@ -50,7 +50,7 @@ begin
 	allocpayid, hidden, transtype, descript, instanceid)
 	select * from dblink(remote_conn,CONCAT('select paymentid, allocdate, whoalloc, amount, invoice_no, 
 	allocpayid, hidden, transtype, descript,',db_instance_id,E' from proview.payalloc where allocdate  between
-	\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+	\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 	(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'' )) 
 	AS P(paymentid int4, allocdate timestamp, whoalloc varchar, amount numeric, invoice_no int4, allocpayid int4, 
 	hidden bool, transtype text, descript text, instanceid int4);
@@ -59,7 +59,7 @@ begin
 	
 	--Getting number of records from source db which being inserted into interm database
 	select into sourcedbcount count(*) from dblink(remote_conn,E'select paymentid from proview.payalloc where allocdate between 
-	\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+	\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 	(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'') AS P(paymentid int4);
 	
 	

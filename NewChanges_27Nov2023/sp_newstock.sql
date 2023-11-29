@@ -17,7 +17,6 @@ declare
 	cut_off_time varchar(50);
 	lastsuccessfullexecuteddate varchar(50)  = '1570-01-01 00:00:00';;
 begin
-	raise notice 'Start';
     --This code is for fetch the cut off time based on instance id
 	cut_off_time = ' ' || (select cast((select cutofftime from pinnacle_interim_database.source_db_mapping where sourceid = db_instance_id) as varchar));
 
@@ -25,10 +24,9 @@ begin
 	and lh.tablename = table_name
 	and lh.returncode = success_code and lh.createddate between (select cast((concat(cast(prm_date as date),
 	start_time)) as timestamp))	and (select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp))) = 0 then
-    raise notice '1 ';
 		--This block will execute for the first time for all the record from remote database
 		IF (select count(*) from pinnacle_interim_database.newstock where instanceid = db_instance_id) = 0 then
-		raise notice '2 ';
+
 		insert into pinnacle_interim_database.newstock(ic,
 		model,part,"year",cc,"unique","condition",bin,miles,"comments",
 		vstockno,datein,ene_type,box_type,bod_type,bod_col,yardid,ticket_no,rprice,
@@ -53,7 +51,7 @@ begin
 		popart bool, inventoryid int4, isprivate bool, checkedon timestamp, lastupdate timestamp,
 		privatenote text, instanceid int4);
 		GET DIAGNOSTICS cust_insertedRow_count = ROW_COUNT;
-	    raise notice '3 ';
+
 		--Getting number of records from source db which being inserted into interm database
 		select into sourcedbcount count(*) from dblink(remote_conn,'select inventoryid from proview.newstock') AS P(inventoryid int4);
 	
@@ -61,7 +59,7 @@ begin
 		perform pinnacle_interim_database.add_log(db_instance_id,'newstock',sourcedbcount,cust_insertedRow_count,cust_deletedRows_count,'Success',0,'');
  
 		else
-		raise notice '4 ';
+
 		--Fetch the last successfull date and time, when job was executed
 	    lastsuccessfullexecuteddate = (select max(lastsuccessfulldatetime) from pinnacle_interim_database.log_history lh where lh.tablename = table_name and lh.returncode = success_code);
 		if lastsuccessfullexecuteddate IS NOT NULL and lastsuccessfullexecuteddate != '1570-01-01 00:00:00' then
@@ -69,7 +67,7 @@ begin
 	    --if lastsuccessfullexecuteddate  IS NOT null then	   	
 		delete from pinnacle_interim_database.newstock where inventoryid in (select * from dblink(remote_conn,CONCAT
 		(E'select inventoryid from proview.newstock where lastupdate between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'')) AS P(inventoryid int4));
 	
 	    raise notice '5 ';
@@ -87,7 +85,7 @@ begin
 		objectword,resolve,transmit,costprice,lastpriced,altindex,vpblink,converted,
 		multiloc,doublecond,verified,popart,inventoryid,isprivate,checkedon,lastupdate,
 		privatenote,',db_instance_id,E' from proview.newstock where lastupdate between
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'')) 
 		AS P(ic bpchar(6), model bpchar(4), part bpchar(2), "year" bpchar(4), cc bpchar(4), "unique" int8,
 		"condition" bpchar(1), bin varchar, miles int4, "comments" varchar, vstockno varchar(8),
@@ -103,7 +101,7 @@ begin
 	    raise notice '6 ';
 		--Getting number of records from source db which being inserted into interm database
 		select into sourcedbcount count(*) from dblink(remote_conn,E'select inventoryid from proview.newstock where lastupdate between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'')	AS P(inventoryid int4);
 	
 		--insert log table

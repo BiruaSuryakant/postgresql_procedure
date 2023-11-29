@@ -56,7 +56,7 @@ begin
 		select * from dblink(remote_conn,CONCAT('select purchaseledger_id,createddate,username,multiloc,saletype,trantype,vendor,purchaseorder_id,
 		billamount,payamount,informationonly,allocateddate,description,ponumber,',
 		db_instance_id,E' from proview.purchaseledger where createddate between  
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'' )) 
 		AS P(purchaseledger_id int4, createddate timestamp, username varchar, multiloc int4, saletype text,
 		trantype text, vendor int4, purchaseorder_id int4, billamount numeric(10, 2), payamount numeric(10, 2),
@@ -65,14 +65,14 @@ begin
 	
 		--Getting number of records from source db which being inserted into interm database
 		select into sourcecountNewRecords count(*) from dblink(remote_conn,E'select purchaseledger_id from proview.purchaseledger where createddate between
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'') AS P(purchaseledger_id int4);
 	
 	
 		--Below Code is for Deleting Updated Record, which is present in the interm DB
 		delete from pinnacle_interim_database.purchaseledger where purchaseledger_id in 
 		(select * from dblink('remote_conn',CONCAT(E'select purchaseledger_id from proview.purchaseledger where allocateddate between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'')) AS P(purchaseledger_id int4));
 		--Below Code is for Taking the only Updated Record
 		insert into pinnacle_interim_database.purchaseledger(purchaseledger_id,createddate,username,multiloc,saletype,trantype,vendor,purchaseorder_id,
@@ -80,7 +80,7 @@ begin
 		select * from dblink(remote_conn,CONCAT('select purchaseledger_id,createddate,username,multiloc,saletype,trantype,vendor,purchaseorder_id,
 		billamount,payamount,informationonly,allocateddate,description,ponumber,',
 		db_instance_id,E' from proview.purchaseledger where allocateddate between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'')) 
 		AS P(purchaseledger_id int4, createddate timestamp, username varchar, multiloc int4, saletype text,
 		trantype text, vendor int4, purchaseorder_id int4, billamount numeric(10, 2), payamount numeric(10, 2),
@@ -89,7 +89,7 @@ begin
 		
 		--Getting number of records from source db which being inserted into interm database
 		select into sourcecountUpdateRecords count(*) from dblink(remote_conn,E'select purchaseledger_id from proview.purchaseledger where allocateddate between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'') AS P(purchaseledger_id int4);		
 		
 		

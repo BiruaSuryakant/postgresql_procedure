@@ -53,7 +53,7 @@ begin
 		select * from dblink(remote_conn,CONCAT('select allocationid,
 		allocationdate, user, multiloc, ledgerbillid, ledgerpayid, hidden, amount,
 		',db_instance_id,E' from proview.salesallocation where allocationdate between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\''))
 		AS P(allocationid int4, allocationdate timestamp, "user" varchar, multiloc int4, ledgerbillid int4, ledgerpayid int4,
 		hidden bool, amount numeric(10, 2), instanceid int4);
@@ -63,7 +63,7 @@ begin
 		--Getting number of records from source db which being inserted into interm database
 		select into sourcedbcount count(*) from dblink(remote_conn,E'select allocationid
 		from proview.salesallocation where allocationdate between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'') AS P(allocationid int4);
 	
 		--insert log table

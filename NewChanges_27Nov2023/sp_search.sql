@@ -56,7 +56,7 @@ begin
 		select * from dblink(remote_conn,CONCAT('select date,
 		time, user, ic, status, duration, year, model, part, custcode, altindex, multiloc, salesrec, search_id,
 		',db_instance_id,E' from proview.search where date between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\''))
 		AS P("date" date, "time" bpchar(8), "user" varchar, ic bpchar(6), status text, duration numeric,
 		"year" int4, model bpchar(4), part bpchar(2), custcode int4, altindex bpchar(6), multiloc int4,
@@ -67,7 +67,7 @@ begin
 		--Getting number of records from source db which being inserted into interm database
 		select into sourcedbcount count(*) from dblink(remote_conn,E'select search_id
 		from proview.search where date between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'') AS P(search_id int4);
 	
 		--insert log table

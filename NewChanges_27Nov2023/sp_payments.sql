@@ -63,7 +63,7 @@ begin
 	multiloc, created, "date", whocreated, custlink, paytype, paymethod, saletype, till, allocdate, work_ordno,
 	amount, payeename, refnumber, cardtype, cardnumber, bankname, bankcode, btrannum,
 	btranname, btranplace, btrancode,',db_instance_id,E' from proview.payments where created between
-	\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' ||
+	\'' || lastsuccessfullexecuteddate || E'\' and \'' ||
 	(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\''))
 	AS P(paymentid int4, multiloc int4, created timestamp, "date" date, whocreated varchar, custlink int4,
 	paytype text, paymethod text, saletype text, till int4, allocdate timestamp, work_ordno int4,
@@ -76,7 +76,7 @@ begin
 	--Getting number of records from source db which being inserted into interm database
 	select into sourcedbcount count(*) from dblink(remote_conn,E'select paymentid
 	from proview.payments where created  between 
-	\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+	\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 	(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'') AS P(paymentid int4);
 	
 	--insert log table

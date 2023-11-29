@@ -70,7 +70,7 @@ begin
 		delrecord, deliv_zip, total, tax1, 	tax2, salespers, wo_sales_p, taxexempt, taxno, freight, freightt1,
 		freightt2, cust_po, till_no, shipp_meth, wtotal, wtax1, wtax2, surtotal, surtax1, surtax2, dept_code,
 		traceid, multiloc, ro_num, orderby, order_dept, ',db_instance_id,E' from proview.quotes where updated  between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\''))
 		AS P(ordernumber int4, vers bpchar(1), datecreated date, timecreated text, updated timestamp,
 		orderstatus text, paytype bpchar(1), claimno varchar(25), custtype bpchar, custcode int4,
@@ -86,7 +86,7 @@ begin
 		--Getting number of records from source db which being inserted into interm database
 		select into sourcedbcount count(*) from dblink(remote_conn,E'select ordernumber
 		from proview.quotes where updated  between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'') AS P(ordernumber int4);
 	
 		--insert log table

@@ -65,7 +65,7 @@ begin
 		vendor, vendorinvoicenumber, vendorcontact, total, totaltax1, totaltax2, freightlaid, cancelreason, cancelnote,
 		ordered, remote_po_sent, remotewonumber, credited_purchaseorder_id,',
 		db_instance_id,E' from proview.purchaseorder where updated  between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\''))
 		AS P(purchaseorder_id int4, ponumber int4, vers int4, datecreated timestamp, whocreated varchar,
 		updated timestamp, whoupdated_id varchar, category text, ordertype text, orderstatus text, multiloc int4,
@@ -79,7 +79,7 @@ begin
 		--Getting number of records from source db which being inserted into interm database
 		select into sourcedbcount count(*) from dblink(remote_conn,E'select purchaseorder_id
 		from proview.purchaseorder where updated  between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' || 
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' || 
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'')
 		AS P(purchaseorder_id int4);
 	
