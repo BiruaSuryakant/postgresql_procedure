@@ -54,7 +54,7 @@ begin
 	    select * from dblink(remote_conn,CONCAT('select adjustid, allocdate, whoalloc, amount, invoicenumber,
 	    allocpayid, toadjustid, hidden, transtype, descript,',
 	    db_instance_id,E' from proview.adjustalloc where allocdate between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' ||
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' ||
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'')) 
 	    AS P(adjustid int4,
 	    allocdate timestamp, whoalloc varchar, amount numeric, invoicenumber int4, allocpayid int4,
@@ -64,7 +64,7 @@ begin
 		--Getting number of records from source db which being inserted into interm database
 		select into sourcedbcount count(*) from dblink(remote_conn,E'select adjustid 
 		from proview.adjustalloc where allocdate between 
-		\'' || (select cast((concat(cast(lastsuccessfullexecuteddate as date),cut_off_time)) as timestamp)) || E'\' and \'' ||
+		\'' || lastsuccessfullexecuteddate || E'\' and \'' ||
 		(select cast((concat(cast(prm_date as date),cut_off_time)) as timestamp)) || E'\'') AS P(adjustid int4);
 		
 		--insert log table
